@@ -1,8 +1,9 @@
-from time import sleep
-import pytchat #pychatをインポート
-import time
-chat = pytchat.create(video_id="") #対象動画のurlを指定
-while chat.is_alive(): #動画が続いていれば
-    for c in chat.get().items: #チャットを取得
-        print(c.datetime, c.message)
-    time.sleep(5) #sleepを入れないと空のデータが作成される可能性
+import module.my_module as m
+
+def main():
+    id = input("取得したい動画のIDを入力してね！:")
+    url = 'https://www.youtube.com/watch?v=' + id
+    last_time = m.getchat(url)
+    m.chat_analysis(last_time)
+if __name__ == '__main__':
+    main()
