@@ -2,6 +2,8 @@ import pytchat
 import datetime
 import youtube_dl
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from datetime import datetime as dt
 #動画ダウンロード
 def download(url):
     ydl_opts = {}
@@ -44,7 +46,7 @@ def chat_analysis(last_time):
     x = []
     y = []
     comment_cnt = 0
-    now_time = 0
+    now_time = 0.0
     interval_time = 30
     plt.xlim(0,(int(last_time)//interval_time) + interval_time)
     with open('C:\\Users\\ryota\\Desktop\\youtube\\output\\chat.txt', 'r') as f:
@@ -60,9 +62,20 @@ def chat_analysis(last_time):
                         if tc in comment:
                             comment_cnt += 1
                 else:
-                    x.append(now_time//interval_time)
+                    td = str(datetime.timedelta(seconds=now_time))
+                    td = '2012-12-29 ' + td
+                    td = dt.strptime(td, '%Y-%m-%d %H:%M:%S')
+                    x.append(td)
                     y.append(comment_cnt)
                     comment_cnt = 0
                     now_time += interval_time
-    plt.plot(x, y)
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    xfmt = mdates.DateFormatter("%H/%M/%S")
+    xloc = mdates.HourLocator()
+    ax.xaxis.set_major_locator(xloc)
+    ax.xaxis.set_major_formatter(xfmt)
+    # x軸の範囲
+    #ax.set_xlim() 
+    #ax.grid(True)
     plt.show()

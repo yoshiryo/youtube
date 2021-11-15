@@ -1,34 +1,30 @@
-import pytchat
 import datetime
+from datetime import datetime as dt
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.dates as mdates
 
-def main():
-    def getchat(url):
-        p = True
-        chat = pytchat.create(video_id=url) #対象動画のurlを指定
-        while chat.is_alive(): #動画が続いていれば
-            for c in chat.get().items: #チャットを取得
-                tstr = c.datetime
-                tdatetime = datetime.datetime.strptime(tstr, '%Y-%m-%d %H:%M:%S') #datetimeに変換
-                if p: #最初のチャットを基準
-                    p = False
-                    standard_time = tdatetime
-                    chat_message = "0" + "　" + c.message + "\n"
-                else: #それ以外は差を計算
-                    else_time = tdatetime
-                    difference_time = else_time - standard_time
-                    chat_message =  str(difference_time.seconds) + "　" + c.message + "\n"
-                print(chat_message)
-    #getchat("https://www.youtube.com/watch?v=5yDQRxUNeIQ")
+td1 = str(datetime.timedelta(seconds=0))
+td1 = '2012-12-29 ' + td1
+td1 = dt.strptime(td1, '%Y-%m-%d %H:%M:%S')
 
-    tstr1 = "0:28"
-    tstr2 = "4:50:04"
-    if tstr1.count(":") == 1:
-        tstr1 = "0:" + tstr1
+td2 = str(datetime.timedelta(seconds=10000))
+td2 = '2012-12-29 ' + td2
+td2 = dt.strptime(td2, '%Y-%m-%d %H:%M:%S')
 
-    tdatetime1 = datetime.datetime.strptime(tstr1, '%H:%M:%S')
-    tdatetime2 = datetime.datetime.strptime(tstr2, '%H:%M:%S')
-    difference_time = tdatetime2 - tdatetime1
-    print(difference_time.seconds)
+td3 = str(datetime.timedelta(seconds=20000))
+td3 = '2012-12-29 ' + td3
+td3 = dt.strptime(td3, '%Y-%m-%d %H:%M:%S')
+dates = [td1, td2, td3]
+y = [1, 2, 1]
 
-if __name__ == '__main__':
-    main()
+fig, ax = plt.subplots()
+ax.plot(dates, y)
+xfmt = mdates.DateFormatter("%H/%M/%S")
+xloc = mdates.HourLocator()
+ax.xaxis.set_major_locator(xloc)
+ax.xaxis.set_major_formatter(xfmt)
+# x軸の範囲
+#ax.set_xlim() 
+ax.grid(True)
+plt.show()
