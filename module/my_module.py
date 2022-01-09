@@ -1,3 +1,4 @@
+import re
 import pytchat
 import datetime
 import youtube_dl
@@ -45,6 +46,7 @@ def chat_analysis(last_time):
         target_comments = f.read().split("\n")
     x = []
     y = []
+    xy = []
     comment_cnt = 0
     now_time = 0.0
     interval_time = 30
@@ -67,6 +69,7 @@ def chat_analysis(last_time):
                     td = dt.strptime(td, '%Y-%m-%d %H:%M:%S')
                     x.append(td)
                     y.append(comment_cnt)
+                    xy.append([td, comment_cnt])
                     comment_cnt = 0
                     now_time += interval_time
     fig, ax = plt.subplots()
@@ -79,3 +82,16 @@ def chat_analysis(last_time):
     #ax.set_xlim() 
     #ax.grid(True)
     plt.show()
+    return xy
+
+def exciting_scene(xy, id):
+    sorted_xy = sorted(xy, key=lambda x:x[1], reverse=True)
+    for i in range(5):
+        dtime = sorted_xy[i][0]
+        hour = dtime.hour
+        minute = dtime.minute
+        second = dtime.second
+        total = hour*60*60 + minute*60 + second
+        print(dtime.strftime("%H:%M:%S"))
+        print("https://www.youtube.com/watch?v=" + id + "&t=" + str(total))
+
