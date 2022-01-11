@@ -5,6 +5,8 @@ import youtube_dl
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime as dt
+import MeCab
+import collections
 #動画ダウンロード
 def download(url):
     ydl_opts = {}
@@ -40,7 +42,8 @@ def getchat(url):
             f.write("\n".join(lines))
     return difference_time.seconds
 
-def chat_analysis(last_time):
+#target_commentで指定したコメントが一定時間にどれくらい含まれているかカウント
+def chat_count(last_time):
     target_comments = []
     with open('C:\\Users\\ryota\\Desktop\\youtube\\input\\target_comment.txt', 'r') as f:
         target_comments = f.read().split("\n")
@@ -84,6 +87,7 @@ def chat_analysis(last_time):
     plt.show()
     return xy
 
+#特にコメントが盛り上がった時間の上位5つをurlにして抜き出す
 def exciting_scene(xy, id):
     sorted_xy = sorted(xy, key=lambda x:x[1], reverse=True)
     for i in range(5):
@@ -95,3 +99,26 @@ def exciting_scene(xy, id):
         print(dtime.strftime("%H:%M:%S"))
         print("https://www.youtube.com/watch?v=" + id + "&t=" + str(total))
 
+def chat_analysis():
+    m = MeCab.Tagger()
+    all_words = []
+    with open('C:\\Users\\ryota\\Desktop\\youtube\\output\\chat.txt', 'r') as f:
+        for line in f:
+            if len(line) == 0 or line == "\n":
+                continue
+            else:
+                c = line.split("　")
+                time = c[0]
+                comment = c[1]
+                node = m.parseToNode(comment)
+                while node:
+                    hin = node.feature.split(",")
+                    if "gg" in hin:
+                        print(hin)
+                    hinshi = node.feature.split(",")[0]
+                    if len(hin) >= 7: #hinshi in ["名詞","動詞","形容詞"]:
+                        origin = node.feature.split(",")[7]
+                        all_words.append(origin)
+                    node = node.next
+    c = collections.Counter(all_words)
+    print(c["GG"])
