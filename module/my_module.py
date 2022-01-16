@@ -7,6 +7,7 @@ import matplotlib.dates as mdates
 from datetime import datetime as dt
 import MeCab
 import collections
+import ipadic
 #動画ダウンロード
 def download(url):
     ydl_opts = {}
@@ -100,7 +101,7 @@ def exciting_scene(xy, id):
         print("https://www.youtube.com/watch?v=" + id + "&t=" + str(total))
 
 def chat_analysis():
-    m = MeCab.Tagger()
+    m = MeCab.Tagger(ipadic.MECAB_ARGS)
     all_words = []
     with open('C:\\Users\\ryota\\Desktop\\youtube\\output\\chat.txt', 'r') as f:
         for line in f:
@@ -112,13 +113,10 @@ def chat_analysis():
                 comment = c[1]
                 node = m.parseToNode(comment)
                 while node:
-                    hin = node.feature.split(",")
-                    if "gg" in hin:
-                        print(hin)
+                    word = node.surface
                     hinshi = node.feature.split(",")[0]
-                    if len(hin) >= 7: #hinshi in ["名詞","動詞","形容詞"]:
-                        origin = node.feature.split(",")[7]
-                        all_words.append(origin)
+                    if hinshi in ["名詞", "形容詞", "感動詞"]:
+                        all_words.append(word)
                     node = node.next
     c = collections.Counter(all_words)
-    print(c["GG"])
+    print(c.most_common(100))
