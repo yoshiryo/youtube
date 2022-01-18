@@ -100,8 +100,16 @@ def exciting_scene(xy, id):
         print(dtime.strftime("%H:%M:%S"))
         print("https://www.youtube.com/watch?v=" + id + "&t=" + str(total))
 
-def chat_analysis():
+#コメントを形態素解析(Mecab)して指定した品詞の出現をカウントし折れ線グラフにする
+def chat_analysis(last_time):
     m = MeCab.Tagger(ipadic.MECAB_ARGS)
+    x = []
+    y = []
+    xy = []
+    comment_cnt = 0
+    now_time = 0.0
+    interval_time = 30
+    plt.xlim(0,(int(last_time)//interval_time) + interval_time)
     all_words = []
     with open('C:\\Users\\ryota\\Desktop\\youtube\\output\\chat.txt', 'r') as f:
         for line in f:
@@ -112,11 +120,32 @@ def chat_analysis():
                 time = c[0]
                 comment = c[1]
                 node = m.parseToNode(comment)
-                while node:
-                    word = node.surface
-                    hinshi = node.feature.split(",")[0]
-                    if hinshi in ["名詞", "形容詞", "感動詞"]:
-                        all_words.append(word)
-                    node = node.next
+                if now_time <= int(time) < now_time + interval_time:
+                    while node:
+                        word = node.surface
+                        hinshi = node.feature.split(",")[0]
+                        if hinshi in ["名詞", "形容詞", "感動詞"]:
+                            all_words.append(word)
+                            comment_cnt += 1
+                        node = node.next
+                else:
+                    td = str(datetime.timedelta(seconds=now_time))
+                    td = '2012-12-29 ' + td
+                    td = dt.strptime(td, '%Y-%m-%d %H:%M:%S')
+                    x.append(td)
+                    y.append(comment_cnt)
+                    xy.append([td, comment_cnt])
+                    comment_cnt = 0
+                    now_time += interval_time
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    xfmt = mdates.DateFormatter("%H/%M/%S")
+    xloc = mdates.HourLocator()
+    ax.xaxis.set_major_locator(xloc)
+    ax.xaxis.set_major_formatter(xfmt)
+    # x軸の範囲
+    #ax.set_xlim() 
+    #ax.grid(True)
+    plt.show()
     c = collections.Counter(all_words)
     print(c.most_common(100))
